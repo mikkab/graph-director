@@ -51,11 +51,11 @@ def import_directors():
             elif not line.startswith('\t'):
                 m = director_line_pattern.match(line)
                 if m is not None:
-                    director = m.group(1) + ' ' + m.group(2)
+                    director = m.group(2) + ' ' + m.group(1)
                     name = m.group(3)
                     year = int(m.group(4))
                     entry = {'name' : name, 'year' : year}
-                    movies.append(entry)
+                    movies = [entry]
             else:
                 m = movie_line_pattern.match(line)
                 if m is not None:
