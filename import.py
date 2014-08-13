@@ -28,7 +28,7 @@ def import_ratings():
 def persist_director(name, movies):
     def as_entry(movie_name):
         m = ratings.find_one({'name' : movie_name})
-        return {'name' : movie_name, 'year' : m['year'], 'votes' : m['votes']} if m is not None else None
+        return {'name' : movie_name, 'year' : m['year'], 'votes' : m['votes'], 'rating' : m['rating']} if m is not None else None
 
     movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name']), movies))
     entry = {'name' : name, 'movies' : movies }
@@ -36,10 +36,13 @@ def persist_director(name, movies):
 
 
 def import_directors():
+
     directors.drop()
 
     director_line_pattern = re.compile('([ -~]+),\s([ -~]+)\t{1}([ -~]+)\s\((\d{4})\)')
     movie_line_pattern = re.compile('\t{3}([ -~]+)\s\((\d{4})\)')
+
+    starts_with = ''
 
     with open('data/directors_one.list') as d:
         director = ''
@@ -52,6 +55,10 @@ def import_directors():
                 m = director_line_pattern.match(line)
                 if m is not None:
                     director = m.group(2) + ' ' + m.group(1)
+                    last_name = m.group(1)
+                    if last_name[0].lower() != starts_with.lower():
+                        print last_name[0]
+                        starts_with = last_name[0]
                     name = m.group(3)
                     year = int(m.group(4))
                     entry = {'name' : name, 'year' : year}
@@ -67,11 +74,4 @@ def import_directors():
 
 #import_ratings()
 import_directors()
-
-#print ratings.find_one({'name' : 'Avatar'})
-
-
-
-
-
 
