@@ -1,0 +1,16 @@
+.row
+  highchart.col-lg-12(config='config' style='height: 600px')
+.row
+  h1.text-center {{director.name}}
+  p.text-center(style='white-space:pre;')
+    | Average rating of {{(director.avg_rating).toFixed(2)}}/10 based on {{numberWithCommas(director.total_votes)}} votes for {{director.movies.length}} movies
+    | Share this page on:
+hr
+.row.col-lg-6.col-lg-offset-3.text-center
+  form.form-inline(role='form' ng-submit='submit()')
+    h1 Graph another director
+    input.form-control#q(type='text' placeholder='Enter the name of a director' ng-model='new_director' )
+    button.btn.btn-default(type='submit') Submit
+
+  
+                                         

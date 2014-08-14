@@ -1,2 +1,10 @@
-.row
-  highchart.col-lg-12(config='config' style='height: 600px')
+.row.col-lg-6.col-lg-offset-3.text-center
+  form.form-inline(role='form' ng-submit='submit()' ng-controller='MainCtrl')
+    h1 Graph ratings of your favorite directors
+    input.form-control#q(type='text' placeholder='Enter the name of a director' autofocus='autofocus' ng-model='name' )
+    button.btn.btn-default(type='submit') Submit
+
+ 
+
+  
+                                         

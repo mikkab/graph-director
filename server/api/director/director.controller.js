@@ -20,6 +20,13 @@ exports.show = function(req, res) {
   });
 };
 
+// Get director names
+exports.list = function(req, res) {
+  MongoClient.connect('mongodb://127
+
 function handleError(res, err) {
   return res.send(500, err);
+}
+
+function connect() {
 }
