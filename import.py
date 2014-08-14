@@ -7,6 +7,8 @@ db = client.graph_directors
 
 ratings = db.ratings
 directors = db.directors
+bulk = []
+BULK_SIZE = 5000
 
 def import_ratings():
     ratings.drop()
@@ -25,17 +27,23 @@ def import_ratings():
     return inserted
 
 
+
 def persist_director(name, movies):
+    global bulk
     def as_entry(movie_name):
         m = ratings.find_one({'name' : movie_name})
         return {'name' : movie_name, 'year' : m['year'], 'votes' : m['votes'], 'rating' : m['rating']} if m is not None else None
 
     movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name']), movies))
     entry = {'name' : name, 'movies' : movies }
-    directors.insert(entry)
+    bulk.append(entry)
+    if len(bulk) == BULK_SIZE:
+        directors.insert(bulk)
+        bulk = []
 
 
 def import_directors():
+    global bulk
 
     directors.drop()
 
@@ -44,7 +52,7 @@ def import_directors():
 
     starts_with = ''
 
-    with open('data/directors_one.list') as d:
+    with open('data/directors_cropped.list') as d:
         director = ''
         movies = []
 
@@ -60,6 +68,8 @@ def import_directors():
                         print last_name[0]
                         starts_with = last_name[0]
                     name = m.group(3)
+                    if is_tv_series(name):
+                        continue
                     year = int(m.group(4))
                     entry = {'name' : name, 'year' : year}
                     movies = [entry]
@@ -67,10 +77,18 @@ def import_directors():
                 m = movie_line_pattern.match(line)
                 if m is not None:
                     name = m.group(1)
+                    if is_tv_series(name):
+                        continue
                     year = int(m.group(2))
                     entry = {'name' : name, 'year' : year}
                     movies.append(entry)
 
+    if bulk:
+        directors.insert(bulk)
+
+
+def is_tv_series(name):
+    return name.startswith('"') and name.endswith('"')
 
 #import_ratings()
 import_directors()
