@@ -49,10 +49,8 @@ def import_directors():
 
     directors.drop()
 
-    director_line_pattern = re.compile('([ -~]+),\s([ -~]+)\t{1}([ -~]+)\s\((\d{4})\)')
-    movie_line_pattern = re.compile('\t{3}([ -~]+)\s\((\d{4})\)')
-
-    starts_with = ''
+    director_line_pattern = re.compile("([ ',-~]+),\s([ ',-~]+)(\s\([IVX]+\))?\t{1}([ ',-~]+)\s\((\d{4})\)")
+    movie_line_pattern = re.compile("\t{3}([ ',-~]+)\s\((\d{4})\)")
 
     with open('data/directors_cropped.list') as d:
         director = ''
@@ -66,15 +64,12 @@ def import_directors():
             elif not line.startswith('\t'):
                 m = director_line_pattern.match(line)
                 if m is not None:
-                    director = m.group(2) + ' ' + m.group(1)
+                    director = m.group(2) + ' ' + m.group(1) + (m.group(3) if m.group(3) else '')
                     last_name = m.group(1)
-                    if last_name[0].lower() != starts_with:
-                        print last_name[0]
-                        starts_with = last_name[0].lower()
-                    name = m.group(3)
+                    name = m.group(4)
                     if is_tv_series(name):
                         continue
-                    year = int(m.group(4))
+                    year = int(m.group(5))
                     entry = {'name' : name, 'year' : year}
                     movies = [entry]
             else:
