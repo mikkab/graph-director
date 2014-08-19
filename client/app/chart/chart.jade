@@ -9,8 +9,6 @@ hr
 .row.col-lg-6.col-lg-offset-3.text-center
   form.form-inline(role='form' ng-submit='submit()')
     h1 Graph another director
-    input.form-control#q(type='text' placeholder='Enter the name of a director' ng-model='new_director' )
+    autocomplete(ng-model='new_director' data='directors' placeholder='Enter the name of a director')
     button.btn.btn-default(type='submit') Submit
-
-  
                                          

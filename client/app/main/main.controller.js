@@ -2,10 +2,14 @@
 
 angular.module('graphDirectorApp')
   .controller('MainCtrl', function ($scope, $http, $location) {
-    $scope.name = '';
+    $http.get('/api/directors').success(function(directors) {
 
-    $scope.submit = function() {
-      console.log('submit' + $scope.name);
-      $location.path('/chart/' + $scope.name);
-    }
+      $scope.name = '';
+      $scope.directors = directors;
+
+      $scope.submit = function() {
+        console.log('submit' + $scope.name);
+        $location.path('/chart/' + $scope.name);
+      }
+    });
   });

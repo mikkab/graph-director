@@ -16,7 +16,8 @@
     "lodash": "~2.4.1",
     "angular-ui-router": "~0.2.10",
     "highcharts": "~4.0.3",
-    "highcharts-ng": "~0.0.6"
+    "highcharts-ng": "~0.0.6",
+    "allmighty-autocomplete" : "*"
   },
   "devDependencies": {
     "angular-mocks": ">=1.2.*",

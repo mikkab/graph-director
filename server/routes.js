@@ -6,6 +6,7 @@
 
 var errors = require('./components/errors');
 var MongoClient = require('mongodb').MongoClient
+var _ = require('lodash');
 var db;
 
 
@@ -32,6 +33,18 @@ module.exports = function(app) {
         db.collection('directors').find({name : req.params.name}).toArray(function(err, results) {
           if (err) throw err;
           res.end(JSON.stringify(results));
+        });
+    });
+  });
+
+  app.route('/api/directors').get(function(req, res) {
+     connect(function(err, db) {
+        if (err) throw err;
+
+        db.collection('directors').find({}, {_id : 0, name : 1}).sort({name : 1}).toArray(function(err, results) {
+          if (err) throw err;
+          var names = _.pluck(results, 'name');
+          res.end(JSON.stringify(names));
         });
     });
   });

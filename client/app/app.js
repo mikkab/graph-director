@@ -6,7 +6,8 @@ angular.module('graphDirectorApp', [
   'ngSanitize',
   'ui.router',
   'ui.bootstrap',
-  'highcharts-ng'
+  'highcharts-ng',
+  'autocomplete'
 ])
   .config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider

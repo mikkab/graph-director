@@ -56,12 +56,17 @@ angular.module('graphDirectorApp')
           allowDecimals: false,
           title: {
             text: 'year'
-          }
+          },
+          minPadding: 0.03,
+          maxPadding: 0.03
+
         },
         yAxis: {
           title: {
             text: 'IMDb rating'
-          }
+          },
+          minPadding: 0.12,
+          maxPadding: 0.04
         },
         series: [{
           name: 'Ratings',
@@ -92,4 +97,9 @@ angular.module('graphDirectorApp')
     $scope.submit = function() {
       console.log('submit ' + $scope.new_director);
     }
+
+    $http.get('/api/directors').success(function(directors) {
+      $scope.directors = directors;
+    });
+
   }]);
