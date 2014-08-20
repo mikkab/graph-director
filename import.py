@@ -37,7 +37,7 @@ def persist_director(name, movies):
         return {'name' : movie_name, 'year' : m['year'], 'votes' : m['votes'], 'rating' : m['rating']} if m is not None else None
 
     movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name']), movies))
-    if movies:
+    if len(movies) > 1:
         bulk.append({'name' : name, 'movies' : movies })
         if len(bulk) == BULK_SIZE:
             directors.insert(bulk)
@@ -49,8 +49,9 @@ def import_directors():
 
     directors.drop()
 
-    director_line_pattern = re.compile("([ ',-~]+),\s([ ',-~]+)(\s\([IVX]+\))?\t{1}([ ',-~]+)\s\((\d{4})\)")
-    movie_line_pattern = re.compile("\t{3}([ ',-~]+)\s\((\d{4})\)")
+    movie_pattern = "([ ',-~]+)\s\((\d{4})\)(\s\([V]{1,2}\))?"
+    director_line_pattern = re.compile("([ ',-~]+),\s([ ',-~]+)(\s\([IVX]+\))?\t{1,2}" + movie_pattern)
+    movie_line_pattern = re.compile("\t{3}" + movie_pattern)
 
     with open('data/directors_cropped.list') as d:
         director = ''
@@ -67,7 +68,7 @@ def import_directors():
                     director = m.group(2) + ' ' + m.group(1) + (m.group(3) if m.group(3) else '')
                     last_name = m.group(1)
                     name = m.group(4)
-                    if is_tv_series(name):
+                    if is_tv_series(name) or m.group(6):
                         continue
                     year = int(m.group(5))
                     entry = {'name' : name, 'year' : year}
@@ -76,7 +77,7 @@ def import_directors():
                 m = movie_line_pattern.match(line)
                 if m is not None:
                     name = m.group(1)
-                    if is_tv_series(name):
+                    if is_tv_series(name) or m.group(3):
                         continue
                     year = int(m.group(2))
                     entry = {'name' : name, 'year' : year}
