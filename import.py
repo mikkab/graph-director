@@ -1,43 +1,23 @@
 from pymongo import MongoClient
+import requests
 import re
 
 client = MongoClient()
-
 db = client.graph_directors
-
-ratings = db.ratings
 directors = db.directors
+
 bulk = []
 BULK_SIZE = 100
-
-def import_ratings():
-    ratings.drop()
-
-    rating_pattern = re.compile('\s+[0-9\.]+\s+(\d+)\s{3}(\d.\d)\s{2}([ -~]+)\s\((\d{4})\)')
-    inserted = 0
-    with open('data/ratings_cropped.list') as r:
-        for line in r:
-            if not line.endswith('}\n') and '(VG)' not in line:
-                m = rating_pattern.match(line)
-                if m is not None:
-                    entry = {'name' : m.group(3), 'rating' : float(m.group(2)), 'votes' : int(m.group(1)), 'year' : int(m.group(4))}
-                    if entry['votes'] > 10000:
-                        ratings.insert(entry)
-                        inserted = inserted + 1
-    return inserted
-
+MIN_MOVIE_VOTES = 10000
+MIN_MOVIES = 2
 
 
 def persist_director(name, movies):
     global bulk
     if not name:
         return
-    def as_entry(movie_name):
-        m = ratings.find_one({'name' : movie_name})
-        return {'name' : movie_name, 'year' : m['year'], 'votes' : m['votes'], 'rating' : m['rating']} if m is not None else None
-
-    movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name']), movies))
-    if len(movies) > 1:
+    movies = filter(lambda m : m['votes'] >= MIN_MOVIE_VOTES, movies)
+    if len(movies) >= MIN_MOVIES:
         bulk.append({'name' : name, 'movies' : movies })
         if len(bulk) == BULK_SIZE:
             directors.insert(bulk)
@@ -53,7 +33,7 @@ def import_directors():
     director_line_pattern = re.compile("([ ',-~]+),\s([ ',-~]+)(\s\([IVX]+\))?\t{1,2}" + movie_pattern)
     movie_line_pattern = re.compile("\t{3}" + movie_pattern)
 
-    with open('data/directors_cropped.list') as d:
+    with open('data/directors_one.list') as d:
         director = ''
         movies = []
 
@@ -71,8 +51,7 @@ def import_directors():
                     if is_tv_series(name) or m.group(6):
                         continue
                     year = int(m.group(5))
-                    entry = {'name' : name, 'year' : year}
-                    movies = [entry]
+                    movies = [as_movie(name, year)]
             else:
                 m = movie_line_pattern.match(line)
                 if m is not None:
@@ -80,8 +59,7 @@ def import_directors():
                     if is_tv_series(name) or m.group(3):
                         continue
                     year = int(m.group(2))
-                    entry = {'name' : name, 'year' : year}
-                    movies.append(entry)
+                    movies.append(as_movie(name, year))
 
     if bulk:
         directors.insert(bulk)
@@ -90,6 +68,15 @@ def import_directors():
 def is_tv_series(name):
     return name.startswith('"') and name.endswith('"')
 
-#import_ratings()
+
+def as_movie(name, year):
+    r = requests.get('http://omdbapi.com/?t=' + name).json()
+    rating = float(r['imdbRating']) if r and 'imdbRating' in r and r['imdbRating'] != 'N/A' else 0.0
+    votes = int(r['imdbVotes'].replace(',', '')) if r and 'imdbVotes' in r and r['imdbVotes'] != 'N/A' else 0
+    poster = r['Poster'].replace('http://ia.media-imdb.com/images/M/', '').replace('._V1_SX300.jpg', '') if r and 'Poster' in r else ''
+    imdbId = r['imdbID'] if r and 'imdbID' in r else ''
+    return {'name' : name, 'year' : year, 'rating' : rating, 'votes' : votes, 'poster' : poster, 'imdbId' : imdbId}
+
+
 import_directors()
 
