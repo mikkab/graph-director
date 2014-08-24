@@ -2,39 +2,18 @@
 
 
 angular.module('graphDirectorApp')
-  .controller('ChartCtrl',['$scope', '$http', '$state', '$q', function ($scope, $http, $state, $q) {
-
-    function getPosterPromise(name) {
-      var deferred = $q.defer();
-      $http.get(encodeURI('http://www.omdbapi.com/?t=' + name)).success(function(data) {
-        console.log('poster for', name, data.Poster);
-        deferred.resolve(data.Poster);
-      });
-      return deferred.promise;
-    }
+  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$q', function ($scope, $http, $stateParams, $q) {
 
     $scope.director = null;
     $scope.new_director = ''
 
-    $http.get('/api/director/' + $state.params.name).success(function(directors) {
+    $http.get('/api/director/' + $stateParams.name).success(function(directors) {
       var director = directors[0];
       if (!director)
         return;
       var movies = director.movies;
       director.total_votes = _.reduce(movies, function(votes, movie) { return votes + movie.votes; }, 0);
       director.avg_rating = _.reduce(movies, function(total, movie) { return total + movie.rating * movie.votes; }, 0) / director.total_votes; 
-
-      var movie_names = _.map(movies, function(movie) { return movie.name; }); 
-      var gets = _.map(movie_names, function(name) { 
-        var uri = encodeURI('http://www.omdbapi.com/?t=' + name);
-        return $http.get(uri);
-      });
-
-      $q.all(gets).then(function(results) {
-          var posters = {};
-          angular.forEach(results, function(result) {
-            posters[result.data.Title] = result.data.Poster.replace('SX300', 'SX70');
-          });
 
       $scope.config = {
         options: {
@@ -45,7 +24,8 @@ angular.module('graphDirectorApp')
             formatter: function () {
               return '<b>' + this.point.name + '</b><br>' +
                 'rating: ' + this.point.y + '<br>' +
-                'votes: ' + this.point.votes;
+                'votes: ' + this.point.votes + '<br>' +
+                '{<a href="' + this.point.imdbUrl + '">imdb</a>}    {<a href="' + this.point.amazonUrl + '">amazon</a>}'
             }
           }
         },
@@ -76,9 +56,11 @@ angular.module('graphDirectorApp')
               x : movie.year, 
               y : movie.rating, 
               name : movie.name, 
+              imdbUrl : 'http://www.imdb.com/title/' + movie.imdbId,
+              amazonUrl : 'http://www.amazon.com/s/?url=search-alias%3Ddvd&field-keywords=' + movie.name,
               votes: $scope.numberWithCommas(movie.votes), 
               marker : { 
-                symbol: 'url(' + posters[movie.name] + ')'
+                symbol: 'url(http://ia.media-imdb.com/images/M/' + movie.poster + '._V1_SX75.jpg)'
               }
             }; 
           }),
@@ -86,16 +68,11 @@ angular.module('graphDirectorApp')
         }],
         loading: false
       }
-      });
     $scope.director = director;
     });
 
     $scope.numberWithCommas = function(n) {
       return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-    }
-
-    $scope.submit = function() {
-      console.log('submit ' + $scope.new_director);
     }
 
     $http.get('/api/directors').success(function(directors) {
