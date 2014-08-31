@@ -48,6 +48,19 @@ module.exports = function(app) {
         });
     });
   });
+
+  app.route('/api/directors/top').get(function(req, res) {
+     connect(function(err, db) {
+        if (err) throw err;
+
+        var limit = req.params.limit ? parseInt(req.params.limit) : 200;
+        db.collection('directors').find({}, {_id : 0, name : 1, average : 1}, {limit: limit}).sort({average : -1}).toArray(function(err, results) {
+          if (err) throw err;
+          var names = _.pluck(results, 'name');
+          res.end(JSON.stringify(names));
+        });
+    });
+  });
   
   // All undefined asset or api routes should return a 404
   app.route('/:url(api|auth|components|app|bower_components|assets)/*')
