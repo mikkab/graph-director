@@ -5,6 +5,7 @@ var MIN_LENGTH_FOR_AUTOCOMPLETE = 2;
 
 angular.module('graphDirectorApp')
   .controller('MainCtrl', function ($scope, $http, $location) {
+    $http.get('/api/directors').success(function(directors) {
       $scope.name = '';
 
       $scope.submit = function() {
@@ -15,9 +16,8 @@ angular.module('graphDirectorApp')
         if (text.length < MIN_LENGTH_FOR_AUTOCOMPLETE) {
           $scope.directors = [];
         } else if (text.length == MIN_LENGTH_FOR_AUTOCOMPLETE) {
-          $http.get('/api/directors/' + text).success(function(directors) {
-            $scope.directors = directors;
-          });
-        };
-      }
+          $scope.directors = directors;
+        }
+      };
     });
+  });

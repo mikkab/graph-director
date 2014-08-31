@@ -40,8 +40,11 @@ module.exports = function(app) {
   app.route('/api/directors').get(function(req, res) {
      connect(function(err, db) {
         if (err) throw err;
+        var filter = req.query.filter || '';
+        if (filter.length < 2)
+          filter = '';
 
-        db.collection('directors').find({}, {_id : 0, name : 1}).sort({name : 1}).toArray(function(err, results) {
+        db.collection('directors').find({name: {$regex : filter}}, {_id : 0, name : 1}).sort({name : 1}).toArray(function(err, results) {
           if (err) throw err;
           var names = _.pluck(results, 'name');
           res.end(JSON.stringify(names));
