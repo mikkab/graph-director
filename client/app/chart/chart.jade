@@ -1,8 +1,9 @@
 .row
   highchart.col-lg-12(config='config' style='height: 600px')
 .row
-  h1.text-center {{director.name}}
   p.text-center(style='white-space:pre;')
     | Average rating of {{(director.avg_rating).toFixed(2)}}/10 based on {{numberWithCommas(director.total_votes)}} votes for {{director.movies.length}} movies
-    | Share this page on:
+    | Share this page on: 
+    a(href='http://twitter.com/share?text=Check+out+this+visualization+of+{{director.name}}+movies!' target='_blank')
+      i.fa.fa-twitter
                                          

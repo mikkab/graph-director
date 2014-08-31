@@ -22,7 +22,18 @@ exports.show = function(req, res) {
 
 // Get director names
 exports.list = function(req, res) {
-  MongoClient.connect('mongodb://127
+  MongoClient.connect('mongodb://127.0.0.1:27017/graph_directors', function(err, db) {
+      if (err) { return handleError(res, err); }
+
+      var directors = db.collection('directors');
+      var filter = req.params.filter; 
+      collection.find( {name: '/.*' + filter + '/.*' }, {_id: 0, name: 1}, function(err, directors) {
+
+        if (err) { return handleError(res, err); }
+        return res.json(_.pluck(directors, 'name'));
+      });
+  });
+};
 
 function handleError(res, err) {
   return res.send(500, err);

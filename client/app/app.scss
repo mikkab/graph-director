@@ -22,10 +22,11 @@ $fa-font-path: "/bower_components/font-awesome/fonts";
 // endinjector
 
 @font-face {
-    font-family: Oxygen, sans-serif;
     src: url(sansation_light.woff);
 }
 
 body {
     overflow-x: hidden;
+    font-size: 21px;
+    font-family: Oxygen, sans-serif;
 }

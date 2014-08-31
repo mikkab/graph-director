@@ -75,8 +75,4 @@ angular.module('graphDirectorApp')
       return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
     }
 
-    $http.get('/api/directors').success(function(directors) {
-      $scope.directors = directors;
-    });
-
   }]);

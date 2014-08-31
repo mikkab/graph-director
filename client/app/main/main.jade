@@ -1,7 +1,7 @@
 .row.col-lg-6.col-lg-offset-3.text-center
   form.form-inline(role='form' ng-submit='submit()' ng-controller='MainCtrl')
     h1 Graph ratings of your favorite directors
-    autocomplete(ng-model='name' data='directors' attr-placeholder='Enter the name of a director...')
+    autocomplete(ng-model='name' data='directors' attr-placeholder='Enter the name of a director...' on-type='typed')
     button.btn.btn-default(type='submit') Submit
 <div ui-view></div>
 
