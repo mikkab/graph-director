@@ -5,6 +5,7 @@ angular.module('graphDirectorApp')
   .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$q', function ($scope, $http, $stateParams, $q) {
 
     $scope.director = null;
+    $scope.show_chart = false;
     $scope.new_director = ''
 
     $http.get('/api/director/' + $stateParams.name).success(function(directors) {
@@ -69,6 +70,7 @@ angular.module('graphDirectorApp')
         loading: false
       }
     $scope.director = director;
+    $scope.show_director = true;
     });
 
     $scope.numberWithCommas = function(n) {
