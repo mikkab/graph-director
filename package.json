@@ -17,7 +17,8 @@
     "mongodb": "~1.4.8",
     "mongoose": "~3.8.8",
     "composable-middleware": "^0.3.0",
-    "connect-mongo": "^0.4.1"
+    "connect-mongo": "^0.4.1",
+    "node-cache": "1.0.x"
   },
   "devDependencies": {
     "grunt": "~0.4.4",
