@@ -16,7 +16,7 @@ var cache = new NodeCache();
 // open a connection and memoize it
 function connect(callback) {
   if (db === undefined) {
-    MongoClient.connect('mongodb://asafdav2:28578@kahana.mongohq.com:10060/app28168427', function(err, _db) {
+    MongoClient.connect(process.env.MONGOHQ_URL, function(err, _db) {
         if (err) { return callback(err) };
         db = _db;
         callback(null, db);
