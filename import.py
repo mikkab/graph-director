@@ -1,7 +1,9 @@
 from pymongo import MongoClient
 import requests
 import re
+import os.path
 import sys
+import urllib
 
 client = MongoClient()
 db = client.graph_directors
@@ -10,6 +12,8 @@ directors = db.directors
 
 MIN_MOVIE_VOTES = 10000
 MIN_MOVIES = 3
+
+posters_dir = 'posters'
 
 def import_ratings():
     ratings.drop()
@@ -98,7 +102,26 @@ def persist_director(director_name, movies):
             sys.stdout.flush()
 
 
+def download_poster(movie, opener):
+    code = movie['poster']
+    if code == 'N/A':
+        return
+    dest = posters_dir + '/' + code + '.jpg'
+    if os.path.isfile(dest):
+        return
+    url = 'http://ia.media-imdb.com/images/M/' + code + '._V1_SX75.jpg'
+    opener.retrieve(url, dest)
+    print 'retrieved ' + movie['name']
+
+def download_posters():
+    opener = urllib.FancyURLopener({})
+    for director in directors.find():
+        for movie in director['movies']:
+            download_poster(movie, opener)
+
+
 
 #import_ratings()
-import_directors()
+#import_directors()
+download_posters()
 
