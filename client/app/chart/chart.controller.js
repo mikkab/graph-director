@@ -61,7 +61,7 @@ angular.module('graphDirectorApp')
               amazonUrl : 'http://www.amazon.com/s/?url=search-alias%3Ddvd&field-keywords=' + movie.name,
               votes: $scope.numberWithCommas(movie.votes), 
               marker : { 
-                symbol: 'url(http://ia.media-imdb.com/images/M/' + movie.poster + '._V1_SX75.jpg)'
+                symbol: 'url(https://s3.amazonaws.com/graph_director_movie_posters/' + movie.poster + '.jpg)'
               }
             }; 
           }),
