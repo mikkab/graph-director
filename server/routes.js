@@ -54,7 +54,7 @@ module.exports = function(app) {
   app.route('/api/director/:name').delete(function(req, res) {
       var name = req.params.name;
       var key = name;
-      cache.del(key);
+      res.end(cache.del(key));
     });
 
   app.route('/api/directors').get(function(req, res) {
@@ -85,7 +85,7 @@ module.exports = function(app) {
 
   app.route('/api/directors').delete(function(req, res) {
     var key = '_directors_';
-    cache.del(key);
+    res.end(cache.del(key));
   });
 
   app.route('/api/directors/top').get(function(req, res) {
@@ -114,7 +114,7 @@ module.exports = function(app) {
 
   app.route('/api/directors/top').delete(function(req, res) {
     var key = '_top_';
-    cache.del(key);
+    res.end(cache.del(key));
   });
 
   // All undefined asset or api routes should return a 404
