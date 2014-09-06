@@ -5,15 +5,19 @@ import os.path
 import sys
 import urllib
 
-client = MongoClient()
-db = client.graph_directors
-ratings = db.ratings
-directors = db.directors
+hq_url = os.environ.get('MONGOHQ_URL')
+hq_client = MongoClient(hq_url)
+local_client = MongoClient()
+hq_db = hq_client.app29171798
+local_db = local_client.graph_directors
+ratings = local_db.ratings
+directors = hq_db.directors
 
 MIN_MOVIE_VOTES = 10000
 MIN_MOVIES = 3
 
 posters_dir = 'posters'
+
 
 def import_ratings():
     ratings.drop()
@@ -78,12 +82,12 @@ def calculate_average_rating(movies):
 
 
 def persist_director(director_name, movies):
-    def as_entry(movie_name):
-        m = ratings.find_one({'name' : movie_name})
+    def as_entry(movie_name, year):
+        m = ratings.find_one({'name' : movie_name, 'year' : year})
         if not m:
             return None
         try:
-            r = requests.get('http://omdbapi.com/?t=' + movie_name).json()
+            r = requests.get('http://omdbapi.com/?t=' + movie_name + '&y=' + str(year)).json()
         except:
             r = {}
         rating = float(r['imdbRating']) if r and 'imdbRating' in r and r['imdbRating'] != 'N/A' else 0.0
@@ -95,7 +99,7 @@ def persist_director(director_name, movies):
     if not director_name:
         return
     if len(movies) >= MIN_MOVIES:
-        movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name']), movies))
+        movies = filter(lambda m: m is not None, map(lambda m: as_entry(m['name'], m['year']), movies))
         if len(movies) >= MIN_MOVIES:
             directors.insert({'name' : director_name, 'movies' : movies, 'average' : calculate_average_rating(movies) })
             print(director_name)
@@ -122,6 +126,6 @@ def download_posters():
 
 
 #import_ratings()
-#import_directors()
-download_posters()
+import_directors()
+#download_posters()
 
