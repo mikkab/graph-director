@@ -58,7 +58,7 @@ angular.module('graphDirectorApp')
               y : movie.rating, 
               name : movie.name, 
               imdbUrl : 'http://www.imdb.com/title/' + movie.imdbId,
-              amazonUrl : 'http://www.amazon.com/s/?url=search-alias%3Ddvd&field-keywords=' + movie.name,
+              amazonUrl : 'http://www.amazon.com/s/?ref=nb_ss_d&tag=graphdirector-20&url=search-alias%3Ddvd&field-keywords=' + movie.name,
               votes: $scope.numberWithCommas(movie.votes), 
               marker : { 
                 symbol: 'url(https://s3.amazonaws.com/graph_director_movie_posters/' + movie.poster + '.jpg)'
