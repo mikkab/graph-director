@@ -10,7 +10,7 @@ angular.module('graphDirectorApp')
 
       $scope.submit = function() {
         $location.path('/main/' + $scope.name);
-      }
+      };
 
       $scope.typed = function(text) {
         if (text.length < MIN_LENGTH_FOR_AUTOCOMPLETE) {

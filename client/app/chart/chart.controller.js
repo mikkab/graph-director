@@ -6,7 +6,7 @@ angular.module('graphDirectorApp')
 
     $scope.director = null;
     $scope.show_chart = false;
-    $scope.new_director = ''
+    $scope.new_director = '';
 
     $http.get('/api/director/' + $stateParams.name).success(function(directors) {
       var director = directors[0];
@@ -26,7 +26,7 @@ angular.module('graphDirectorApp')
               return '<b>' + this.point.name + '</b><br>' +
                 'rating: ' + this.point.y + '<br>' +
                 'votes: ' + this.point.votes + '<br>' +
-                '{<a href="' + this.point.imdbUrl + '">imdb</a>}    {<a href="' + this.point.amazonUrl + '">amazon</a>}'
+                '{<a href="' + this.point.imdbUrl + '">imdb</a>}    {<a href="' + this.point.amazonUrl + '">amazon</a>}';
             }
           }
         },
@@ -68,13 +68,13 @@ angular.module('graphDirectorApp')
           showInLegend: false
         }],
         loading: false
-      }
+      };
     $scope.director = director;
     $scope.show_director = true;
     });
 
     $scope.numberWithCommas = function(n) {
       return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "";
-    }
+    };
 
   }]);

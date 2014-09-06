@@ -5,7 +5,7 @@
 'use strict';
 
 var errors = require('./components/errors');
-var MongoClient = require('mongodb').MongoClient
+var MongoClient = require('mongodb').MongoClient;
 var NodeCache = require('node-cache');
 var _ = require('lodash');
 var db;
@@ -17,7 +17,7 @@ var cache = new NodeCache();
 function connect(callback) {
   if (db === undefined) {
     MongoClient.connect(process.env.MONGOHQ_URL, function(err, _db) {
-        if (err) { return callback(err) };
+        if (err) { return callback(err); }
         db = _db;
         callback(null, db);
     });
