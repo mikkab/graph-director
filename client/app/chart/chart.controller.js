@@ -61,6 +61,10 @@ angular.module('graphDirectorApp')
                 '<a class="amazon_link" href="' + this.point.amazonUrl + '">{amazon}</a>'
                 ;
             }
+          },
+          exporting: {
+            sourceHeight: 600,
+            sourceWidth: 1920
           }
         },
         title: {
