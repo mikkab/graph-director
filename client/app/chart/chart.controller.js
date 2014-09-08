@@ -29,6 +29,7 @@ angular.module('graphDirectorApp')
       });
     }(Highcharts));
 
+
     $http.get('/api/director/' + $stateParams.name).success(function(directors) {
       var director = directors[0];
       if (!director)
@@ -39,10 +40,25 @@ angular.module('graphDirectorApp')
 
       $scope.posters = _.map(movies, get_poster_url);
 
+      var data = _.map(movies, function(movie) {
+        return {
+          x : movie.year,
+          y : movie.rating,
+          name : movie.name,
+          imdbUrl : get_imdb_url(movie),
+          amazonUrl : get_amazon_url(movie),
+          votes: $scope.numberWithCommas(movie.votes),
+          poster: get_poster_url(movie)
+        };
+      });
+
+      var xy_data = _.map(data, function(point) {
+        return [point.x, point.y];
+      });
+
       $scope.config = {
         options: {
           chart: {
-            type: 'scatter',
             events: {
               click: function(event) {
                 this.tooltip.hide('hide');
@@ -53,6 +69,9 @@ angular.module('graphDirectorApp')
             useHTML: true,
             hideDelay: 0,
             formatter: function () {
+              if (this.series.name !== 'Ratings') {
+                return false;
+              }
               return '<b>' + this.point.name + '</b><br>' +
                 '<img src="' + this.point.poster + '"><br>' +
                 'rating: ' + this.point.y + '<br>' +
@@ -88,18 +107,16 @@ angular.module('graphDirectorApp')
         },
         series: [{
           name: 'Ratings',
-          data: _.map(movies, function(movie) { 
-
-            return {
-              x : movie.year, 
-              y : movie.rating, 
-              name : movie.name, 
-              imdbUrl : get_imdb_url(movie), 
-              amazonUrl : get_amazon_url(movie),
-              votes: $scope.numberWithCommas(movie.votes),
-              poster: get_poster_url(movie)
-            }; 
-          }),
+          type: 'scatter',
+          data: data,
+          showInLegend: false
+        }, {
+          type: 'line',
+          marker: {enabled: false},
+          enableMouseTracking: false,
+          data: (function() {
+            return fitData(xy_data).data;
+          })(),
           showInLegend: false
         }],
         loading: false
