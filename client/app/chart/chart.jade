@@ -7,4 +7,6 @@ div(ng-show='show_director')
       | Share this page on: 
       a(href='http://twitter.com/share?text=Check+out+this+visualization+of+{{director.name}}+movies!' target='_blank')
         i.fa.fa-twitter
-                                         
+
+img(ng-repeat='poster in posters' ng-src='{{poster}}' ng-show='false')
+

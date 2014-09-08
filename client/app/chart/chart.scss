@@ -1,3 +1,20 @@
 .fa-twitter {
     color: #55ACEE
 }
+
+.highcharts-tooltip span {
+    height:auto;
+    text-align: center;
+    width: 90px;
+    max-width:240px;
+    overflow:auto;
+    white-space:normal !important;
+}
+
+.highcharts-tooltip .imdb_link {
+    float: left;
+}
+
+.highcharts-tooltip .amazon_link {
+    float: right;
+}
