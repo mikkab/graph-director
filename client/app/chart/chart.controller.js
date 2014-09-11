@@ -14,13 +14,6 @@ function get_imdb_url(movie) {
   return 'http://www.imdb.com/title/' + movie.imdbId;
 }
 
-angular.module('graphDirectorApp')
-  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$q', function ($scope, $http, $stateParams, $q) {
-
-    $scope.director = null;
-    $scope.show_chart = false;
-    $scope.new_director = '';
-
     (function (H) {
       H.wrap(H.Tooltip.prototype, 'hide', function (defaultCallback) {
         if (arguments[1] === 'hide') {
@@ -28,6 +21,13 @@ angular.module('graphDirectorApp')
         }
       });
     }(Highcharts));
+
+angular.module('graphDirectorApp')
+  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$q', function ($scope, $http, $stateParams, $q) {
+
+    $scope.director = null;
+    $scope.show_chart = false;
+    $scope.new_director = '';
 
 
     $http.get('/api/director/' + $stateParams.name).success(function(directors) {
