@@ -23,12 +23,32 @@ function get_imdb_url(movie) {
     }(Highcharts));
 
 angular.module('graphDirectorApp')
-  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$q', function ($scope, $http, $stateParams, $q) {
+  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
 
     $scope.director = null;
     $scope.show_chart = false;
     $scope.new_director = '';
 
+    var HEIGHT_RATIO = 0.6;
+
+    var w = angular.element($window);
+    $scope.getWindowDimensions = function () {
+      return {
+        'h': w.height(),
+        'w': w.width()
+      };
+    };
+
+    $scope.$watch($scope.getWindowDimensions, function (newValue, oldValue) {
+      var chart = Highcharts.charts[1];
+      if (chart) {
+        chart.setSize(newValue.w, newValue.h * HEIGHT_RATIO);
+      }
+    }, true);
+
+    w.bind('resize', function() {
+      $scope.$apply();
+    });
 
     $http.get('/api/director/' + $stateParams.name).success(function(directors) {
       var director = directors[0];
@@ -59,6 +79,7 @@ angular.module('graphDirectorApp')
       $scope.config = {
         options: {
           chart: {
+            height: w.height() * HEIGHT_RATIO,
             events: {
               click: function(event) {
                 this.tooltip.hide('hide');
