@@ -1,6 +1,6 @@
 div(ng-show='show_director')
   .row
-    highchart.col-lg-12(config='config' )
+    highchart#chart.col-lg-12(config='config' )
   .row
     p.text-center(style='white-space:pre;')
       | Average rating of {{(director.avg_rating).toFixed(2)}}/10 based on {{numberWithCommas(director.total_votes)}} votes for {{director.movies.length}} movies <br>
@@ -9,4 +9,3 @@ div(ng-show='show_director')
         i.fa.fa-twitter
 
 img(ng-repeat='poster in posters' ng-src='{{poster}}' ng-show='false')
-

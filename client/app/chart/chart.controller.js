@@ -14,22 +14,22 @@ function get_imdb_url(movie) {
   return 'http://www.imdb.com/title/' + movie.imdbId;
 }
 
-    (function (H) {
-      H.wrap(H.Tooltip.prototype, 'hide', function (defaultCallback) {
-        if (arguments[1] === 'hide') {
-          defaultCallback.apply(this);
-        }
-      });
-    }(Highcharts));
+(function (H) {
+  H.wrap(H.Tooltip.prototype, 'hide', function (defaultCallback) {
+    if (arguments[1] === 'hide') {
+      defaultCallback.apply(this);
+    }
+  });
+}(Highcharts));
 
 angular.module('graphDirectorApp')
-  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$window', function ($scope, $http, $stateParams, $window) {
+  .controller('ChartCtrl',['$scope', '$http', '$stateParams', '$window', '$location', '$anchorScroll', function ($scope, $http, $stateParams, $window, $location, $anchorScroll) {
 
     $scope.director = null;
     $scope.show_chart = false;
     $scope.new_director = '';
 
-    var HEIGHT_RATIO = 0.6;
+    var HEIGHT_RATIO = 2.0/3.0;
 
     var w = angular.element($window);
     $scope.getWindowDimensions = function () {
@@ -83,6 +83,10 @@ angular.module('graphDirectorApp')
             events: {
               click: function(event) {
                 this.tooltip.hide('hide');
+              },
+              load: function(event) {
+                $location.hash('chart');
+                $anchorScroll();
               }
             }
           },
