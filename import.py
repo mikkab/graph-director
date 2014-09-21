@@ -16,58 +16,63 @@ directors = hq_db.directors
 MIN_MOVIE_VOTES = 10000
 MIN_MOVIES = 3
 
-posters_dir = 'posters'
-
 
 def import_ratings():
-    ratings.drop()
 
     rating_pattern = re.compile('\s+[0-9\.]+\s+(\d+)\s{3}(\d.\d)\s{2}([ -~]+)\s\((\d{4})\)')
-    with open('data/ratings_cropped.list') as r:
-        for line in r:
-            if not line.endswith('}\n') and '(VG)' not in line:
-                m = rating_pattern.match(line)
-                if m is not None:
-                    entry = {'name' : m.group(3), 'rating' : float(m.group(2)), 'votes' : int(m.group(1)), 'year' : int(m.group(4))}
-                    if entry['votes'] >= MIN_MOVIE_VOTES:
-                        ratings.insert(entry)
+
+    try:
+        with open('data/ratings.list') as r:
+            ratings.drop()
+            for line in r:
+                if not line.endswith('}\n') and '(VG)' not in line:
+                    m = rating_pattern.match(line)
+                    if m is not None:
+                        entry = {'name' : m.group(3), 'rating' : float(m.group(2)), 'votes' : int(m.group(1)), 'year' : int(m.group(4))}
+                        if entry['votes'] >= MIN_MOVIE_VOTES:
+                            ratings.insert(entry)
+    except EnvironmentError:
+        sys.stderr.write('could not read data/ratings.list, please download and extract the ratings file from http://www.imdb.com/interfaces')
 
 
 def import_directors():
-
-    directors.drop()
 
     movie_pattern = "([ ',-~]+)\s\((\d{4})\)(\s\([V]{1,2}\))?"
     director_line_pattern = re.compile("([ ',-~]+),\s([ ',-~]+)(\s\([IVX]+\))?\t{1,2}" + movie_pattern)
     movie_line_pattern = re.compile("\t{3}" + movie_pattern)
 
-    with open('data/directors_cropped.list') as d:
-        director = ''
-        movies = []
+    try:
+        with open('data/directors.list') as d:
+            directors.drop()
+            director = ''
+            movies = []
 
-        for line in d:
-            if line == '\n':
-                persist_director(director, movies)
-                director = ''
-                movies = []
-            elif not line.startswith('\t'):
-                m = director_line_pattern.match(line)
-                if m is not None:
-                    director = m.group(2) + ' ' + m.group(1)
-                    last_name = m.group(1)
-                    name = m.group(4)
-                    if is_tv_series(name) or m.group(6):
-                        continue
-                    year = int(m.group(5))
-                    movies = [{'name' : name, 'year' : year}]
-            else:
-                m = movie_line_pattern.match(line)
-                if m is not None:
-                    name = m.group(1)
-                    if is_tv_series(name) or m.group(3):
-                        continue
-                    year = int(m.group(2))
-                    movies.append({'name' : name, 'year' : year})
+            for line in d:
+                if line == '\n':
+                    persist_director(director, movies)
+                    director = ''
+                    movies = []
+                elif not line.startswith('\t'):
+                    m = director_line_pattern.match(line)
+                    if m is not None:
+                        director = m.group(2) + ' ' + m.group(1)
+                        last_name = m.group(1)
+                        name = m.group(4)
+                        if is_tv_series(name) or m.group(6):
+                            continue
+                        year = int(m.group(5))
+                        movies = [{'name' : name, 'year' : year}]
+                else:
+                    m = movie_line_pattern.match(line)
+                    if m is not None:
+                        name = m.group(1)
+                        if is_tv_series(name) or m.group(3):
+                            continue
+                        year = int(m.group(2))
+                        movies.append({'name' : name, 'year' : year})
+    except EnvironmentError:
+        sys.stderr.write('could not read data/ratings.list, please download and extract the ratings file from http://www.imdb.com/interfaces')
+
 
 
 def is_tv_series(name):
@@ -76,6 +81,8 @@ def is_tv_series(name):
 
 def calculate_average_rating(movies):
     average = 0.0
+    if not movies:
+        return average
     for m in movies:
         average += m['rating']
     return average / len(movies)
@@ -110,12 +117,12 @@ def download_poster(movie, opener):
     code = movie['poster']
     if code == 'N/A':
         return
-    dest = posters_dir + '/' + code + '.jpg'
+    ## TODO: automatically upload posters to S3 instead of storing on disc and uploading manually
+    dest = 'posters/' + code + '.jpg'
     if os.path.isfile(dest):
         return
     url = 'http://ia.media-imdb.com/images/M/' + code + '._V1_SX75.jpg'
     opener.retrieve(url, dest)
-    print 'retrieved ' + movie['name']
 
 def download_posters():
     opener = urllib.FancyURLopener({})
@@ -124,8 +131,8 @@ def download_posters():
             download_poster(movie, opener)
 
 
-
+## uncomment to download...
 #import_ratings()
-import_directors()
+#import_directors()
 #download_posters()
 
