@@ -7,7 +7,7 @@ function get_poster_url(movie) {
 }
 
 function get_amazon_url(movie) {
-  return 'http://www.amazon.com/s/?ref=nb_ss_d&tag=graphdirector-20&url=search-alias%3Ddvd&field-keywords=' + movie.name;
+  return 'http://www.amazon.com/s/?ref=nb_ss_d&url=search-alias%3Ddvd&tag=graphdirector-20&field-keywords=' + movie.name;
 }
 
 function get_imdb_url(movie) {
